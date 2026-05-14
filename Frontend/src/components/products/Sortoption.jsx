@@ -6,7 +6,9 @@
 
 const Sortoption = () => {
   return (
-    <div>Sortoption</div>
+    <div>
+      Sortoption
+    </div>
   )
 }
 
