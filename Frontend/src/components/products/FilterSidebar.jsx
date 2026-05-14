@@ -7,8 +7,10 @@
 import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 const FilterSidebar = () => {
   const [searchParams, setSearchParams] = useSearchParams("");
+  const navigate = useNavigate();
   const [filter, setFilter] = useState({
     category: "",
     gender: "",
@@ -82,21 +84,30 @@ const FilterSidebar = () => {
       newFilters[name] = value;
     }
     setFilter(newFilters);
-    console.log(newFilters);
-    };
-    
-    const updateURLParams = (newFilters) => {
-        const params = new URLSearchParams();
-        // {category: "top wear", size :["XS","S"]}
-        Object.keys(newFilters).forEach((key) => {
-            if (Array.isArray(newFilters[key]) && newFilters[key].length > 0) {
-                params.append(key, newFilters[key].join(","));
-            } else if (newFilters[key]) {
-                params.set(key, newFilters[key]);
-            }
-        });
-        setSearchParams(params);
-    };
+    updateURLParams(newFilters);
+  };
+
+  const updateURLParams = (newFilters) => {
+    const params = new URLSearchParams();
+    // {category: "top wear", size :["XS","S"]}
+    Object.keys(newFilters).forEach((key) => {
+      if (Array.isArray(newFilters[key]) && newFilters[key].length > 0) {
+        params.append(key, newFilters[key].join(","));
+      } else if (newFilters[key]) {
+        params.set(key, newFilters[key]);
+      }
+    });
+    setSearchParams(params);
+    navigate(`?${params.toString()}`); //?category=bottom+wear&size=XS%2CS
+  };
+
+  const handlePriceChange = (e) => {
+    const newPrice = e.target.value;
+    setPriceRange([0, newPrice]);
+    const newFilters = { ...filter, minPrice: 0, maxPrice: newPrice };
+    setFilter(newFilters);
+    updateURLParams(newFilters);
+  };
 
   return (
     <div className="p-4">
@@ -113,6 +124,7 @@ const FilterSidebar = () => {
               name="category"
               value={category}
               onChange={handleFilterChange}
+              checked={filter.category === category}
               className="mr-2 h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300"
             />
             <span className="text-gray-700">{category}</span>
@@ -131,6 +143,7 @@ const FilterSidebar = () => {
               name="gender"
               value={gender}
               onChange={handleFilterChange}
+              checked={filter.gender === gender}
               className="mr-2 h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300"
             />
             <span className="text-gray-700">{gender}</span>
@@ -146,7 +159,9 @@ const FilterSidebar = () => {
               key={color}
               value={color}
               onClick={handleFilterChange}
-              className="w-8 h-8 rounded-full border border-gray-300 cursor-pointer transition hover:scale-105"
+              className={`w-8 h-8 rounded-full border border-gray-300 cursor-pointer transition hover:scale-105 ${
+                filter.color === color ? "ring-2 ring-blue-500" : ""
+              }`}
               style={{
                 backgroundColor: color.toLowerCase(),
               }}
@@ -164,6 +179,7 @@ const FilterSidebar = () => {
               name="size"
               value={size}
               onChange={handleFilterChange}
+              checked={filter.size.includes(size)}
               className="mr-2 h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300"
             ></input>
             <span className="text-gray-700">{size}</span>
@@ -172,7 +188,7 @@ const FilterSidebar = () => {
       </div>
       {/* material filter */}
       <div className="mb-6">
-        <label className="block text-gray-600 font-medium mb-2">Size</label>
+        <label className="block text-gray-600 font-medium mb-2">Material</label>
         {materials.map((material) => (
           <div key={material} className="flex items-center mb-1">
             <input
@@ -180,6 +196,7 @@ const FilterSidebar = () => {
               name="material"
               value={material}
               onChange={handleFilterChange}
+              checked={filter.material.includes(material)}
               className="mr-2 h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300"
             ></input>
             <span className="text-gray-700">{material}</span>
@@ -196,6 +213,7 @@ const FilterSidebar = () => {
               name="brand"
               value={brand}
               onChange={handleFilterChange}
+              checked={filter.brand.includes(brand)}
               className="mr-2 h-4 w-4 text-blue-500 focus:ring-blue-400 border-gray-300"
             ></input>
             <span className="text-gray-700">{brand}</span>
@@ -212,6 +230,8 @@ const FilterSidebar = () => {
           name="priceRange"
           min={0}
           max={100}
+          value={priceRange[1]}
+          onChange={handlePriceChange}
           className="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer"
         />
         <div className="flex justify-between text-gray-600 mt-2">

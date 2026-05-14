@@ -8,6 +8,7 @@ import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import Profile from "./Pages/Profile";
 import CollectionPage from "./Pages/CollectionPage";
+import ProductsDetails from "./components/products/ProductsDetails";
 function App() {
   return (
     <CartProvider>
@@ -49,6 +50,10 @@ function App() {
             <Route
               path="/collections/:collection"
               element={<CollectionPage></CollectionPage>}
+            ></Route>
+            <Route
+              path="products/:id"
+              element={<ProductsDetails></ProductsDetails>}
             ></Route>
             {/* User layout  */}
           </Route>
